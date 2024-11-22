@@ -1,0 +1,54 @@
+#include <iostream>
+#include <vector>
+#include <limits> 
+using namespace std;
+
+double sum(const vector<double> &p, const vector<double> &q, int i, int j) {
+    double total = 0.0;
+    for (int k = i; k <= j; k++) {
+        total += p[k];
+    }
+    for (int k = i; k <= j + 1; k++) { // Include q[i] to q[j+1]
+        total += q[k];
+    }
+    return total;
+}
+
+double optimalBST(vector<int> &keys, vector<double> &p, vector<double> &q, int n) {
+    vector<vector<double>> cost(n + 1, vector<double>(n + 1, 0));
+
+    for (int i = 0; i <= n; i++) {
+        cost[i][i] = q[i]; // Cost when no keys exist between i and i-1
+    }
+
+    for (int len = 1; len <= n; len++) {
+        for (int i = 0; i <= n - len; i++) {
+            int j = i + len - 1;
+            cost[i][j] = 200.0 ;
+
+            double probSum = sum(p, q, i, j);
+
+            for (int r = i; r <= j; r++) {
+                double leftCost = (r > i) ? cost[i][r - 1] : 0;
+                double rightCost = (r < j) ? cost[r + 1][j] : 0;
+
+                double totalCost = leftCost + rightCost + probSum;
+                cost[i][j] = min(cost[i][j], totalCost);
+            }
+        }
+    }
+
+    return cost[0][n - 1];
+}
+
+int main() {
+    vector<int> keys = {10, 20, 30, 40};
+    vector<double> p = {0.3, 0.3, 0.1, 0.1}; 
+    vector<double> q = {0.2, 0.3, 0.1, 0.1, 0.1}; 
+    int n = keys.size();
+
+    cout << "Minimum cost of Optimal Binary Search Tree: " 
+         << optimalBST(keys, p, q, n) << endl;
+
+    return 0;
+}

@@ -1,0 +1,69 @@
+#include <iostream>
+#include <vector>
+#include <queue>
+using namespace std;
+
+int spanningTree(int V, vector<vector<pair<int, int>>> &adj) {
+    // Priority queue to store {weight, node}
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    vector<int> vis(V, 0); // Visited vector
+    int sum = 0;
+
+    // Start from the 0th node with weight 0
+    pq.push({0, 0});
+
+    while (!pq.empty()) {
+        auto it = pq.top();
+        pq.pop();
+        int node = it.second;
+        int wt = it.first;
+
+        if (vis[node] == 1) continue;
+
+        vis[node] = 1; // Mark node as visited
+        sum += wt;     // Add weight to MST sum
+
+        for (auto it : adj[node]) {
+            int adj_node = it.first;
+            int adj_wt = it.second;
+
+            if (!vis[adj_node]) {
+                pq.push({adj_wt, adj_node});
+            }
+        }
+    }
+
+    return sum;
+}
+
+int main() {
+    int V = 5; // Number of vertices
+
+    // Graph representation: adjacency list
+    vector<vector<pair<int, int>>> adj(V);
+
+    // Add edges (node1, node2, weight)
+    adj[0].push_back({1, 2});
+    adj[1].push_back({0, 2});
+
+    adj[1].push_back({2, 3});
+    adj[2].push_back({1, 3});
+
+    adj[0].push_back({3, 6});
+    adj[3].push_back({0, 6});
+
+    adj[1].push_back({3, 8});
+    adj[3].push_back({1, 8});
+
+    adj[1].push_back({4, 5});
+    adj[4].push_back({1, 5});
+
+    adj[2].push_back({4, 7});
+    adj[4].push_back({2, 7});
+
+    // Compute the MST
+    int mstSum = spanningTree(V, adj);
+    cout << "The sum of the weights of the MST is: " << mstSum << endl;
+
+    return 0;
+}

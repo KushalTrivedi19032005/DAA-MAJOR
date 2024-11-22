@@ -1,0 +1,61 @@
+#include <iostream>
+#include <vector>
+#include <climits>
+using namespace std;
+
+int sum(const vector<int> &freq, int i, int j) {
+    int total = 0;
+    for (int k = i; k <= j; k++) {
+        total += freq[k];
+    }
+    return total;
+}
+
+int optimalBST(vector<int> &keys, vector<int> &freq, int n) {
+   vector<vector<int>> cost(n,vector<int>(n,0));
+
+   for(int i=0;i<n;i++){
+    cost[i][i]=freq[i];
+   }
+
+   for(int len=2;len<=n;len++){
+    for(int i=0;i<=n-len;i++){
+      int j=i+len-1;
+      cost[i][j]=INT_MAX;
+
+      int f=sum(freq,i,j);
+
+      for(int r=i;r<=j;r++){
+        int leftSum=(r>i)?cost[i][r-1]:0;
+        int rightSum=(r<j)?cost[r+1][j]:0;
+        int totalSum=leftSum+rightSum+f;
+        cost[i][j]=min(cost[i][j],totalSum);
+      }
+    }
+   }
+
+    cout << "DP Table:" << endl;
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < n; j++) {
+            if (i > j) {
+                cout << "0\t";
+            } else {
+                cout << cost[i][j] << "\t";
+            }
+        }
+        cout << endl;
+    }
+
+    return cost[0][n - 1];
+}
+
+int main() {
+    vector<int> keys = {10, 20, 30, 40};
+    vector<int> freq = {4, 2, 6, 3};
+    int n = keys.size();
+
+    cout << "Minimum cost of Optimal Binary Search Tree: " 
+         << optimalBST(keys, freq, n) << endl;
+
+    return 0;
+}

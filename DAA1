@@ -1,0 +1,100 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+// Recursive solution for 0/1 Knapsack
+int recursive_knapsack(vector<int> &weights, vector<int> &values, int n, int capacity) {
+    if (n == 0 || capacity == 0) 
+        return 0; // No items or no capacity
+
+    if (weights[n - 1] > capacity) 
+        return recursive_knapsack(weights, values, n - 1, capacity);
+
+    int include = values[n - 1] + recursive_knapsack(weights, values, n - 1, capacity - weights[n - 1]);
+    int exclude = recursive_knapsack(weights, values, n - 1, capacity);
+
+    return max(include, exclude);
+}
+
+// DP solution for 0/1 Knapsack (Bottom-Up)
+int knapsackDP(vector<int> &weights, vector<int> &values, int capacity, int n) {
+    vector<vector<int>> dp(n + 1, vector<int>(capacity + 1, 0));
+
+    for (int i = 1; i <= n; i++) {
+        for (int w = 1; w <= capacity; w++) {
+            if (weights[i - 1] <= w) {
+                dp[i][w] = max(values[i - 1] + dp[i - 1][w - weights[i - 1]], dp[i - 1][w]);
+            } else {
+                dp[i][w] = dp[i - 1][w];
+            }
+        }
+    }
+
+    return dp[n][capacity];
+}
+
+// Space-Optimized DP solution for 0/1 Knapsack
+int knapsackDPSpaceOptimized(vector<int> &weights, vector<int> &values, int capacity) {
+    int n = weights.size();
+    vector<int> dp(capacity + 1, 0);
+
+    for (int i = 0; i < n; i++) {
+        for (int w = capacity; w >= weights[i]; w--) { // Process in reverse
+            dp[w] = max(dp[w], values[i] + dp[w - weights[i]]);
+        }
+    }
+
+    return dp[capacity];
+}
+
+struct Item {
+    int value, weight;
+};
+
+bool compare(Item a, Item b) {
+    double r1 = (double)a.value / a.weight;
+    double r2 = (double)b.value / b.weight;
+    return r1 > r2;
+}
+
+double fractionalKnapsack(int capacity, vector<Item> &items) {
+    sort(items.begin(), items.end(), compare);
+
+    double maxValue = 0.0; 
+
+    for (auto &item : items) {
+        if (capacity >= item.weight) {
+            maxValue += item.value;
+            capacity -= item.weight;
+        } else {
+            // Take a fraction of the item
+            maxValue += item.value * ((double)capacity / item.weight);
+            break;
+        }
+    }
+
+    return maxValue;
+}
+
+int main() {
+    vector<int> weights = {1, 2, 3};
+    vector<int> values = {10, 15, 40};
+    int capacity = 6;
+
+    // Recursive solution
+    cout << "Maximum profit (Recursive): " 
+         << recursive_knapsack(weights, values, weights.size(), capacity) << endl;
+
+    // DP solution
+    cout << "Maximum profit (DP): " 
+         << knapsackDP(weights, values, capacity, weights.size()) << endl;
+
+    // Space-optimized DP solution
+    cout << "Maximum profit (Space-Optimized DP): " 
+         << knapsackDPSpaceOptimized(weights, values, capacity) << endl;
+
+    vector<Item> items={{10,1},{5,2},{40,3}};
+    double maxValue = fractionalKnapsack(capacity, items);
+    cout << "Maximum value in the knapsack: " << maxValue << endl;
+
+    return 0;
+}

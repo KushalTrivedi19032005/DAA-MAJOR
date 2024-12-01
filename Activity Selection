@@ -1,0 +1,36 @@
+#include<bits/stdc++.h>
+using namespace std;
+
+struct act{
+  int start;
+  int end;
+};
+
+bool compare(act a, act b){
+  return a.end<b.end;
+}
+
+int ans(vector<act> &probs, int n){
+  sort(probs.begin(),probs.end(),compare);
+  int num=1;
+  int ending=probs[0].end;
+
+  for(int i=1;i<n;i++){
+    if(probs[i].start>=ending){
+      ending=probs[i].end;
+      num++;
+    }
+    else{
+      continue;
+    }
+  }
+
+  return num;
+}
+
+int main() {
+  vector<act> probs={{1,3},{2,5},{4,6},{6,7},{5,8},{8,9}};
+  int n=probs.size();
+  cout<<ans(probs,n)<<endl;
+  return 0;
+}
